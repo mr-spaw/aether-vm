@@ -1,3 +1,6 @@
+//g++ -o main main.cpp -lGL -lGLU -lglut -O3 -std=c++11
+
+
 #include <iostream>
 #include <vector>
 #include <cmath>
