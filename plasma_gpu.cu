@@ -22,11 +22,11 @@ constexpr double MP   = 1.672621898e-27;
 // Simulation parameters
 // ============================================================
 constexpr int    NX = 128, NY = 128, NZ = 128;  // Increased grid
-constexpr int    NP = 25000000;  // More particles to use VRAM
+constexpr int    NP = 25000;  // More particles to use VRAM
 constexpr double DX = 5e-4;
 constexpr double DT = 2e-14;
 constexpr double L  = NX * DX;
-constexpr int    SUBSTEP = 100;  // More substeps between renders
+constexpr int    SUBSTEP = 10;  // More substeps between renders
 int RENDER_SKIP = 5; // Dynamic - can be adjusted
 
 // ============================================================
