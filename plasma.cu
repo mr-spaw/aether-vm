@@ -971,7 +971,6 @@ void drawBox() {
     glEnd();
 }
 
-// 2. ADD these NEW functions (before display function):
 void drawToroidalChamber() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1208,7 +1207,7 @@ void drawMagneticFieldLines() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-// 3. COMPLETELY REPLACE display() function with this:
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
