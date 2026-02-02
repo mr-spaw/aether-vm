@@ -7,7 +7,7 @@ This CUDA/C++ simulation implements a **fully-3D Particle-in-Cell (PIC) plasma p
 ![Fusion Plasma Simulation](https://img.shields.io/badge/Physics-Fusion%20Plasma-blueviolet) ![CUDA Accelerated](https://img.shields.io/badge/Compute-CUDA%20Accelerated-green) ![OpenGL Visualization](https://img.shields.io/badge/Visualization-OpenGL-orange)
 
 
-🎥 [CUDA Simulation](simulation_demos/sim.mp4)
+🎥 [CUDA Simulation](simulation_demos/fusion_demo.gif)
 
 ## 🎯 Key Features
 
