@@ -1,12 +1,10 @@
-//g++ -o main main.cpp -lGL -lGLU -lglut -O3 -std=c++11
-
-
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include <cstdlib>
 #include <algorithm>
 #include <GL/glut.h>
+
 
 // ============================================================
 // Physical constants (SI)
@@ -17,6 +15,7 @@ constexpr double QE   = -1.60217662e-19;
 constexpr double ME   = 9.10938356e-31;
 constexpr double MP   = 1.672621898e-27;
 
+
 // ============================================================
 // Simulation parameters
 // ============================================================
@@ -26,6 +25,7 @@ constexpr double DX = 5e-4;
 constexpr double DT = 2e-14;
 constexpr double L  = NX * DX;
 constexpr int    SUBSTEP = 6;
+
 
 // ============================================================
 // Visualization settings
@@ -38,6 +38,7 @@ bool showBField = false;
 bool showDensity = true;
 int renderMode = 0; // 0=all, 1=slice, 2=volume
 
+
 // ============================================================
 // Camera controls
 // ============================================================
@@ -47,6 +48,7 @@ float camAngleY = 45.0f;
 int mouseX = 0, mouseY = 0;
 bool mouseDown = false;
 float autoRotate = 0.0f;
+
 
 // ============================================================
 // Particle structure
@@ -58,6 +60,7 @@ struct Particle {
     int species;
 };
 
+
 // ============================================================
 // Global simulation data
 // ============================================================
@@ -66,6 +69,7 @@ std::vector<double> Ex, Ey, Ez, Bx, By, Bz;
 std::vector<double> rho, Jx, Jy, Jz;
 std::vector<double> density;
 
+
 int idx(int i, int j, int k) {
     i = (i + NX) % NX;
     j = (j + NY) % NY;
@@ -73,12 +77,14 @@ int idx(int i, int j, int k) {
     return i + NX * (j + NY * k);
 }
 
+
 // ============================================================
 // Physics routines
 // ============================================================
 void depositCharge() {
     std::fill(rho.begin(), rho.end(), 0.0);
     std::fill(density.begin(), density.end(), 0.0);
+
 
     for (auto& p : particles) {
         int i = int(p.x / DX);
@@ -94,12 +100,15 @@ void depositCharge() {
     double ion_rho = -(QE * (NP/2)) / (L*L*L);
     for (double &r : rho) r += ion_rho;
 
+
 }
+
 
 void depositCurrent() {
     std::fill(Jx.begin(), Jx.end(), 0.0);
     std::fill(Jy.begin(), Jy.end(), 0.0);
     std::fill(Jz.begin(), Jz.end(), 0.0);
+
 
     for (auto& p : particles) {
         int i = int(p.x / DX);
@@ -118,6 +127,7 @@ void depositCurrent() {
 void updateFields() {
     const double EMAX = 1e6;
 
+
     // -------------------------
     // Faraday's law (∂B/∂t = -∇×E)
     // -------------------------
@@ -126,6 +136,7 @@ void updateFields() {
             for (int k = 0; k < NZ; k++) {
                 int id = idx(i, j, k);
 
+
                 double curlEx_y = (Ez[idx(i, j+1, k)] - Ez[id]) / DX;
                 double curlEx_z = (Ey[idx(i, j, k+1)] - Ey[id]) / DX;
                 double curlEy_z = (Ex[idx(i, j, k+1)] - Ex[id]) / DX;
@@ -133,12 +144,14 @@ void updateFields() {
                 double curlEz_x = (Ey[idx(i+1, j, k)] - Ey[id]) / DX;
                 double curlEz_y = (Ex[idx(i, j+1, k)] - Ex[id]) / DX;
 
+
                 Bx[id] -= DT * (curlEx_y - curlEx_z);
                 By[id] -= DT * (curlEy_z - curlEy_x);
                 Bz[id] -= DT * (curlEz_x - curlEz_y);
             }
         }
     }
+
 
     // -------------------------
     // Ampere-Maxwell law (∂E/∂t = c²∇×B − J/ε₀)
@@ -148,6 +161,7 @@ void updateFields() {
             for (int k = 0; k < NZ; k++) {
                 int id = idx(i, j, k);
 
+
                 double curlBx_y = (Bz[idx(i, j+1, k)] - Bz[id]) / DX;
                 double curlBx_z = (By[idx(i, j, k+1)] - By[id]) / DX;
                 double curlBy_z = (Bx[idx(i, j, k+1)] - Bx[id]) / DX;
@@ -155,9 +169,11 @@ void updateFields() {
                 double curlBz_x = (By[idx(i+1, j, k)] - By[id]) / DX;
                 double curlBz_y = (Bx[idx(i, j+1, k)] - Bx[id]) / DX;
 
+
                 Ex[id] += DT * (C * C * (curlBx_y - curlBx_z) - Jx[id] / EPS0);
                 Ey[id] += DT * (C * C * (curlBy_z - curlBy_x) - Jy[id] / EPS0);
                 Ez[id] += DT * (C * C * (curlBz_x - curlBz_y) - Jz[id] / EPS0);
+
 
                 // -------------------------
                 // SAFETY CLAMP (debug only)
@@ -169,6 +185,7 @@ void updateFields() {
         }
     }
 }
+
 
 void pushParticles() {
     for (auto& p : particles) {
@@ -241,6 +258,7 @@ void pushParticles() {
     }
 }
 
+
 // ============================================================
 // Advanced OpenGL visualization
 // ============================================================
@@ -296,6 +314,7 @@ void drawDensityVolume() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+
 void drawParticlesEnhanced() {
     if (!showParticles) return;
     
@@ -342,6 +361,7 @@ void drawParticlesEnhanced() {
         glEnd();
     }
 }
+
 
 void drawElectricFieldEnhanced() {
     if (!showEField) return;
@@ -390,6 +410,7 @@ void drawElectricFieldEnhanced() {
     glEnd();
 }
 
+
 void drawMagneticField() {
     if (!showBField) return;
     
@@ -437,6 +458,7 @@ void drawMagneticField() {
     glEnd();
 }
 
+
 void drawBoundingBox() {
     glColor4f(0.5f, 0.5f, 0.5f, 0.3f);
     glLineWidth(2.0f);
@@ -462,6 +484,7 @@ void drawBoundingBox() {
     glVertex3f(-1,  1, -1); glVertex3f(-1,  1, 1);
     glEnd();
 }
+
 
 void drawHUD() {
     glMatrixMode(GL_PROJECTION);
@@ -498,6 +521,7 @@ void drawHUD() {
     glMatrixMode(GL_MODELVIEW);
 }
 
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -518,6 +542,7 @@ void display() {
     
     glutSwapBuffers();
 }
+
 
 // ============================================================
 // Time stepping loop
@@ -552,6 +577,7 @@ void idle() {
     
     glutPostRedisplay();
 }
+
 
 // ============================================================
 // Input controls
@@ -595,6 +621,7 @@ void keyboard(unsigned char key, int x, int y) {
     }
 }
 
+
 void mouse(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON) {
         mouseDown = (state == GLUT_DOWN);
@@ -609,6 +636,7 @@ void mouse(int button, int state, int x, int y) {
     if (camDist > 10.0f) camDist = 10.0f;
 }
 
+
 void motion(int x, int y) {
     if (mouseDown) {
         camAngleY += (x - mouseX) * 0.5f;
@@ -621,6 +649,7 @@ void motion(int x, int y) {
         mouseY = y;
     }
 }
+
 
 // ============================================================
 // Initialization
@@ -740,6 +769,7 @@ void initSimulation() {
     std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" << std::endl;
 }
 
+
 void initOpenGL() {
     glClearColor(0.02f, 0.02f, 0.05f, 1.0f);
     glEnable(GL_DEPTH_TEST);
@@ -759,6 +789,7 @@ void initOpenGL() {
     GLfloat fogColor[] = {0.02f, 0.02f, 0.05f, 1.0f};
     glFogfv(GL_FOG_COLOR, fogColor);
 }
+
 
 // ============================================================
 // Main
